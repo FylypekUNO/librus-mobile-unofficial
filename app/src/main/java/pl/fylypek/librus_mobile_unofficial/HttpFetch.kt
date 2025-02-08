@@ -1,6 +1,6 @@
 package pl.fylypek.librus_mobile_unofficial
 
-//import com.google.gson.Gson
+import com.google.gson.Gson
 import java.io.OutputStreamWriter
 import java.net.HttpURLConnection
 import java.net.URL
@@ -64,12 +64,12 @@ fun fetch(url: String, options: FetchOptions = FetchOptions()): Promise<HttpResp
     }
 }
 
-//fun toJson(body: Any): String {
-//    return when (body) {
-//        is String -> body
-//        else -> Gson().toJson(body)
-//    }
-//}
+fun toJson(body: Any): String {
+    return when (body) {
+        is String -> body
+        else -> Gson().toJson(body)
+    }
+}
 
 fun toForm(body: Any): String {
     return when (body) {

@@ -5,11 +5,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import pl.fylypek.librus_mobile_unofficial.json.GradesRoute
 
 class MainActivity : AppCompatActivity() {
-    private var httpClient = HttpClient()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,16 +19,31 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        httpClient = HttpClient(
-            mapOf(
-                "User-Agent" to "Mozilla/5.0 (Linux; Android 10; Pixel 3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.181 Mobile Safari/537.36"
+        fetchGrades("login", "password")
+            .then { grades ->
+                println(grades)
+            }
+    }
+
+    fun fetchGrades(login: String, pass: String): Promise<GradesRoute> {
+        val url = "http://192.168.1.21:3000/api/grades"
+        val options =
+            FetchOptions(
+                method = "POST",
+                headers = mapOf("Content-Type" to "application/json"),
+                body = toJson(mapOf("login" to login, "pass" to pass))
             )
-        )
 
-        GlobalScope.launch { All() }
+        return fetch(url, options)
+            .then { response -> response.json<GradesRoute>() }
+            .catch { error -> println("[/api/grades] Error: $error") }
+            .then {
+                when (it) {
+                    is Either.Resolved -> it.value
+                    is Either.Rejected -> GradesRoute()
+                }
+            }
+
     }
 
-    suspend fun All() {
-
-    }
 }

@@ -44,6 +44,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
 
     implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.gson)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
