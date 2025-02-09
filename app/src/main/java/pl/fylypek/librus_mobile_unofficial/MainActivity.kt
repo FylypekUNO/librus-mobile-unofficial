@@ -5,6 +5,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import pl.fylypek.librus_mobile_unofficial.json.GradesRoute
 
 class MainActivity : AppCompatActivity() {
@@ -13,6 +15,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -23,16 +26,19 @@ class MainActivity : AppCompatActivity() {
             .then { grades ->
                 println(grades)
             }
+
+        val recyclerView = findViewById<RecyclerView>(R.id.rvSubjects)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = SubjectAdapter(mockSubjects)
     }
 
     fun fetchGrades(login: String, pass: String): Promise<GradesRoute> {
         val url = "http://192.168.1.21:3000/api/grades"
-        val options =
-            FetchOptions(
-                method = "POST",
-                headers = mapOf("Content-Type" to "application/json"),
-                body = toJson(mapOf("login" to login, "pass" to pass))
-            )
+        val options = FetchOptions(
+            method = "POST",
+            headers = mapOf("Content-Type" to "application/json"),
+            body = toJson(mapOf("login" to login, "pass" to pass))
+        )
 
         return fetch(url, options)
             .then { response -> response.json<GradesRoute>() }
@@ -43,7 +49,5 @@ class MainActivity : AppCompatActivity() {
                     is Either.Rejected -> GradesRoute()
                 }
             }
-
     }
-
 }
