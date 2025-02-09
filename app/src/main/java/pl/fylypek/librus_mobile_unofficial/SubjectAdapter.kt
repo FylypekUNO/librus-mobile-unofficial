@@ -6,8 +6,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-
-// Adapter wyświetlający przedmioty i ich oceny
 class SubjectAdapter(private val subjects: List<Subject>) :
     RecyclerView.Adapter<SubjectAdapter.SubjectViewHolder>() {
 

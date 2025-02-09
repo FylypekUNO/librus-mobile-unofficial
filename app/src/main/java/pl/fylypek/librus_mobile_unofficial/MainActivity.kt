@@ -7,6 +7,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.tabs.TabLayout
 import pl.fylypek.librus_mobile_unofficial.json.GradesRoute
 
 class MainActivity : AppCompatActivity() {
@@ -29,7 +30,36 @@ class MainActivity : AppCompatActivity() {
 
         val recyclerView = findViewById<RecyclerView>(R.id.rvSubjects)
         recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = SubjectAdapter(mockSubjects)
+
+        val tabLayout = findViewById<TabLayout>(R.id.tabLayout)
+
+        mockSemesters.forEach { semester ->
+            tabLayout.addTab(tabLayout.newTab().setText(semester.name))
+        }
+
+        if (mockSemesters.isNotEmpty()) {
+            recyclerView.adapter = SubjectAdapter(mockSemesters[0].subjects)
+        }
+
+        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                tab?.let {
+                    val index = it.position
+                    val selectedSemester = mockSemesters.getOrNull(index)
+                    selectedSemester?.let { semester ->
+                        recyclerView.adapter = SubjectAdapter(semester.subjects)
+                    }
+                }
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+                // Możesz dodać logikę, gdy zakładka przestaje być wybrana (opcjonalnie)
+            }
+
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+                // Opcjonalnie obsłuż ponowne wybranie tej samej zakładki
+            }
+        })
     }
 
     fun fetchGrades(login: String, pass: String): Promise<GradesRoute> {
