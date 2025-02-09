@@ -1,4 +1,4 @@
-package pl.fylypek.librus_mobile_unofficial
+package pl.fylypek.librus_mobile_unofficial.js
 
 import com.google.gson.Gson
 import java.io.OutputStreamWriter

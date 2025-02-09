@@ -1,4 +1,4 @@
-package pl.fylypek.librus_mobile_unofficial
+package pl.fylypek.librus_mobile_unofficial.js
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -107,9 +107,9 @@ class Promise<S> {
         return Promise { nextResolve, nextReject ->
             fun <T> runFinallyAndPass(value: T): Promise<T> {
                 return try {
-                    Promise.resolve(callback()).then { value }
+                    resolve(callback()).then { value }
                 } catch (e: Throwable) {
-                    Promise.reject(e)
+                    Companion.reject(e)
                 }
             }
 
