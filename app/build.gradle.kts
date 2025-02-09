@@ -45,6 +45,7 @@ dependencies {
 
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.gson)
+    implementation(libs.threetenabp)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

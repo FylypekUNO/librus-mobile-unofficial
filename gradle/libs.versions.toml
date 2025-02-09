@@ -11,6 +11,7 @@ activity = "1.10.0"
 constraintlayout = "2.2.0"
 kotlinx-coroutines = "1.7.3" # Latest version working on kotlin 1.9.x
 gson = "2.10.1"
+threetenabp = "1.4.8"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -23,6 +24,7 @@ androidx-activity = { group = "androidx.activity", name = "activity", version.re
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+threetenabp = { group = "com.jakewharton.threetenabp", name = "threetenabp", version.ref = "threetenabp" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
