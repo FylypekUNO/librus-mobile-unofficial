@@ -23,8 +23,7 @@ class SubjectAdapter(private val subjects: List<Subject>) :
     override fun onBindViewHolder(holder: SubjectViewHolder, position: Int) {
         val subject = subjects[position]
         holder.tvSubjectName.text = subject.name
-        // Łączymy oceny w jeden ciąg, oddzielając przecinkami
-        holder.tvSubjectGrades.text = subject.grades.joinToString(separator = ", ")
+        holder.tvSubjectGrades.text = subject.gradesAsString
     }
 
     override fun getItemCount(): Int = subjects.size
