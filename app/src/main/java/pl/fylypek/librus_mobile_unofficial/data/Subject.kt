@@ -1,4 +1,4 @@
-package pl.fylypek.librus_mobile_unofficial
+package pl.fylypek.librus_mobile_unofficial.data
 
 data class Subject(
     val name: String,

@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.jakewharton.threetenabp.AndroidThreeTen
+import pl.fylypek.librus_mobile_unofficial.ui.GradesFragment
+import pl.fylypek.librus_mobile_unofficial.ui.ScheduleFragment
 
 class MainActivity : AppCompatActivity() {
 

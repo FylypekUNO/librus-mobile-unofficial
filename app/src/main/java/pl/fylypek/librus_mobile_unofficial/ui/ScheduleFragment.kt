@@ -1,4 +1,4 @@
-package pl.fylypek.librus_mobile_unofficial
+package pl.fylypek.librus_mobile_unofficial.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,6 +12,8 @@ import org.threeten.bp.DayOfWeek
 import org.threeten.bp.LocalDate
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.temporal.ChronoUnit
+import pl.fylypek.librus_mobile_unofficial.R
+import pl.fylypek.librus_mobile_unofficial.weeklyScheduleData
 
 class ScheduleFragment : Fragment() {
 
@@ -57,7 +59,7 @@ class ScheduleFragment : Fragment() {
 
     private fun updateScheduleForDate(date: LocalDate) {
         val dayOfWeek: DayOfWeek = date.dayOfWeek
-        val scheduleForDay = weeklySchedule[dayOfWeek] ?: emptyList()
+        val scheduleForDay = weeklyScheduleData[dayOfWeek] ?: emptyList()
         rvSchedule.adapter = ScheduleAdapter(scheduleForDay)
     }
 
