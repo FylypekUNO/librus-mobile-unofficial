@@ -8,4 +8,8 @@
         android:id="@+id/nav_schedule"
         android:icon="@drawable/ic_schedule"
         android:title="Schedule" />
+    <item
+        android:id="@+id/action_logout"
+        android:icon="@drawable/icons8_logout_48"
+        android:title="Logout" />
 </menu>

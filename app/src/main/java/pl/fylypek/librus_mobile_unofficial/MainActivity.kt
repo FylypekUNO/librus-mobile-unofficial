@@ -1,5 +1,6 @@
 package pl.fylypek.librus_mobile_unofficial
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -13,9 +14,8 @@ class MainActivity : AppCompatActivity() {
 
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
 
-        // Ustawienie nasłuchiwania pozycji w dolnej nawigacji
         bottomNavigationView.setOnNavigationItemSelectedListener { item ->
-            when(item.itemId) {
+            when (item.itemId) {
                 R.id.nav_grades -> {
                     openFragment(GradesFragment())
                     true
@@ -24,11 +24,17 @@ class MainActivity : AppCompatActivity() {
                     openFragment(ScheduleFragment())
                     true
                 }
+                R.id.action_logout -> {
+                    val intent = Intent(this, LoginActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    }
+                    startActivity(intent)
+                    true
+                }
                 else -> false
             }
         }
 
-        // Ustawienie domyślnego fragmentu
         if (savedInstanceState == null) {
             bottomNavigationView.selectedItemId = R.id.nav_grades
         }
