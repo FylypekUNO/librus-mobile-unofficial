@@ -4,7 +4,7 @@ import org.threeten.bp.DayOfWeek
 import pl.fylypek.librus_mobile_unofficial.data.ScheduleItem
 import pl.fylypek.librus_mobile_unofficial.data.Semester
 
-val gradesData: List<Semester> = listOf(
+var gradesData: List<Semester> = listOf(
     Semester(
         name = "Semestr 1",
         subjects = emptyList()
@@ -15,7 +15,7 @@ val gradesData: List<Semester> = listOf(
     )
 )
 
-val weeklyScheduleData: Map<DayOfWeek, List<ScheduleItem>> = mapOf(
+var weeklyScheduleData: Map<DayOfWeek, List<ScheduleItem>> = mapOf(
     DayOfWeek.MONDAY to emptyList(),
     DayOfWeek.TUESDAY to emptyList(),
     DayOfWeek.WEDNESDAY to emptyList(),
