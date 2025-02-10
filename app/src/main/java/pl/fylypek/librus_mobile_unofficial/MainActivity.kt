@@ -60,7 +60,7 @@ class MainActivity : AppCompatActivity() {
 
     suspend fun fetchGrades() {
         val body = mapOf(
-            "login" to "10446112u", "pass" to password
+            "login" to login, "pass" to password
         )
 
         val url = "http://192.168.38.178:3000/api/new/grades"
