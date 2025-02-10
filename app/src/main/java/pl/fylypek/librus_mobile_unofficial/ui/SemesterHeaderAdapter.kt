@@ -1,10 +1,11 @@
-package pl.fylypek.librus_mobile_unofficial
+package pl.fylypek.librus_mobile_unofficial.ui
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import pl.fylypek.librus_mobile_unofficial.R
 
 class SemesterHeaderAdapter(private val title: String) :
     RecyclerView.Adapter<SemesterHeaderAdapter.HeaderViewHolder>() {

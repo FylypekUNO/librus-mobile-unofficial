@@ -1,4 +1,4 @@
-package pl.fylypek.librus_mobile_unofficial
+package pl.fylypek.librus_mobile_unofficial.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,6 +8,8 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.tabs.TabLayout
+import pl.fylypek.librus_mobile_unofficial.R
+import pl.fylypek.librus_mobile_unofficial.gradesData
 
 class GradesFragment : Fragment() {
 
@@ -22,19 +24,19 @@ class GradesFragment : Fragment() {
         rvGrades = view.findViewById(R.id.rvGrades)
         rvGrades.layoutManager = LinearLayoutManager(context)
 
-        mockSemesters.forEach { semester ->
+        gradesData.forEach { semester ->
             tabLayout.addTab(tabLayout.newTab().setText(semester.name))
         }
 
-        if (mockSemesters.isNotEmpty()) {
-            rvGrades.adapter = SubjectAdapter(mockSemesters[0].subjects)
+        if (gradesData.isNotEmpty()) {
+            rvGrades.adapter = SubjectAdapter(gradesData[0].subjects)
         }
 
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 val position = tab?.position ?: 0
-                if (position in mockSemesters.indices) {
-                    val selectedSemester = mockSemesters[position]
+                if (position in gradesData.indices) {
+                    val selectedSemester = gradesData[position]
                     rvGrades.adapter = SubjectAdapter(selectedSemester.subjects)
                 }
             }

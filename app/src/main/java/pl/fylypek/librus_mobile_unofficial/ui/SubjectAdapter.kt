@@ -1,10 +1,12 @@
-package pl.fylypek.librus_mobile_unofficial
+package pl.fylypek.librus_mobile_unofficial.ui
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import pl.fylypek.librus_mobile_unofficial.R
+import pl.fylypek.librus_mobile_unofficial.data.Subject
 
 class SubjectAdapter(private val subjects: List<Subject>) :
     RecyclerView.Adapter<SubjectAdapter.SubjectViewHolder>() {

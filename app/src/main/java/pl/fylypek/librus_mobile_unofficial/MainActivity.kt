@@ -1,10 +1,21 @@
 package pl.fylypek.librus_mobile_unofficial
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.jakewharton.threetenabp.AndroidThreeTen
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import pl.fylypek.librus_mobile_unofficial.data.Semester
+import pl.fylypek.librus_mobile_unofficial.data.Subject
+import pl.fylypek.librus_mobile_unofficial.js.FetchOptions
+import pl.fylypek.librus_mobile_unofficial.js.fetch
+import pl.fylypek.librus_mobile_unofficial.js.json
+import pl.fylypek.librus_mobile_unofficial.js.toJson
+import pl.fylypek.librus_mobile_unofficial.json.JsonGradesResponse
+import pl.fylypek.librus_mobile_unofficial.ui.GradesFragment
+import pl.fylypek.librus_mobile_unofficial.ui.ScheduleFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -12,37 +23,86 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        AndroidThreeTen.init(this)
+
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
 
+        // Ustawienie nasłuchiwania pozycji w dolnej nawigacji
         bottomNavigationView.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_grades -> {
                     openFragment(GradesFragment())
                     true
                 }
+
                 R.id.nav_schedule -> {
                     openFragment(ScheduleFragment())
                     true
                 }
-                R.id.action_logout -> {
-                    val intent = Intent(this, LoginActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    }
-                    startActivity(intent)
-                    true
-                }
+
                 else -> false
             }
         }
 
+        // Ustawienie domyślnego fragmentu
         if (savedInstanceState == null) {
             bottomNavigationView.selectedItemId = R.id.nav_grades
         }
+
+        // Pobranie danych ocen i planu lekcji
+        GlobalScope.launch { fetchGrades() }
     }
 
     private fun openFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, fragment)
+        supportFragmentManager.beginTransaction().replace(R.id.fragment_container, fragment)
             .commit()
+    }
+
+    suspend fun fetchGrades() {
+        val body = mapOf(
+            "login" to login, "pass" to password
+        )
+
+        val url = "http://192.168.38.178:3000/api/new/grades"
+        val options = FetchOptions(
+            method = "POST", body = toJson(body)
+        )
+
+        val response = fetch(url, options).wait()
+
+        val json = response.json<JsonGradesResponse>()
+
+        /* JSON structure:
+        {
+            "grades": [
+                {
+                    "name": "Język polski",
+                    "semester": [
+                        {
+                            "grades": [ "5" ]
+                        }
+                    ]
+                }
+            ]
+        }
+        */
+
+        val semesterNames = listOf("Semestr 1", "", "Semestr 2")
+
+        val semesters = listOf(0, 2).map { i ->
+            Semester(
+                name = semesterNames[i],
+                subjects = json.grades.map { subject ->
+                    val grades = subject.semesters[i]
+
+                    Subject(
+                        name = subject.name,
+                        grades = grades
+                    )
+                }
+            )
+        }
+
+        gradesData = semesters
     }
 }
