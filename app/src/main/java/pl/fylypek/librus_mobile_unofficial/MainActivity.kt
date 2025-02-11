@@ -1,5 +1,6 @@
 package pl.fylypek.librus_mobile_unofficial
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -7,8 +8,10 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.jakewharton.threetenabp.AndroidThreeTen
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.threeten.bp.DayOfWeek
 import pl.fylypek.librus_mobile_unofficial.data.ScheduleItem
 import pl.fylypek.librus_mobile_unofficial.data.Semester
@@ -21,9 +24,18 @@ import pl.fylypek.librus_mobile_unofficial.json.JsonGradesResponse
 import pl.fylypek.librus_mobile_unofficial.json.JsonScheduleDay
 import pl.fylypek.librus_mobile_unofficial.json.JsonScheduleResponse
 import pl.fylypek.librus_mobile_unofficial.ui.GradesFragment
+import pl.fylypek.librus_mobile_unofficial.ui.LoadingFragment
+import pl.fylypek.librus_mobile_unofficial.ui.LoginActivity
 import pl.fylypek.librus_mobile_unofficial.ui.ScheduleFragment
 
 class MainActivity : AppCompatActivity() {
+
+    private val domain = "http://192.168.1.21:3001"
+
+    private var areGradesFetched = false
+    private var isScheduleFetched = false
+
+    private var currentTab: String = "grades"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,24 +43,6 @@ class MainActivity : AppCompatActivity() {
 
         AndroidThreeTen.init(this)
 
-        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
-
-        // Ustawienie nasłuchiwania pozycji w dolnej nawigacji
-        bottomNavigationView.setOnNavigationItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.nav_grades -> {
-                    openFragment(GradesFragment())
-                    true
-                }
-
-                R.id.nav_schedule -> {
-                    openFragment(ScheduleFragment())
-                    true
-                }
-
-                else -> false
-            }
-        }
 
         val masterKey = MasterKey.Builder(this)
             .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
@@ -62,16 +56,52 @@ class MainActivity : AppCompatActivity() {
             EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
         )
 
-        var login = sharedPreferences.getString("login", "") ?: ""
-        var password = sharedPreferences.getString("password", "") ?: ""
+        val login = sharedPreferences.getString("login", "") ?: ""
+        val password = sharedPreferences.getString("password", "") ?: ""
 
-        // sharedPreferences.edit().putString("key1", "value1").apply()
-        // sharedPreferences.edit().putString("key2", "value2").apply()
-
-        // Ustawienie domyślnego fragmentu
-        if (savedInstanceState == null) {
-            bottomNavigationView.selectedItemId = R.id.nav_grades
+        if (login.isEmpty() || password.isEmpty()) {
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+            return
         }
+
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+
+        // Ustawienie nasłuchiwania pozycji w dolnej nawigacji
+        bottomNavigationView.setOnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_grades -> {
+                    currentTab = "grades"
+                    if (areGradesFetched) {
+                        openFragment(GradesFragment())
+                    } else {
+                        openFragment(LoadingFragment.newInstance("Fetching grades..."))
+                    }
+                    true
+                }
+
+                R.id.nav_schedule -> {
+                    currentTab = "schedule"
+                    if (isScheduleFetched) {
+                        openFragment(ScheduleFragment())
+                    } else {
+                        openFragment(LoadingFragment.newInstance("Fetching schedule..."))
+                    }
+                    true
+                }
+
+                R.id.action_logout -> {
+                    sharedPreferences.edit().remove("login").remove("password").apply()
+                    startActivity(Intent(this, LoginActivity::class.java))
+                    finish()
+                    true
+                }
+
+                else -> false
+            }
+        }
+
+        bottomNavigationView.selectedItemId = R.id.nav_grades
 
         // Pobranie danych ocen i planu lekcji
         GlobalScope.launch { fetchGrades(login, password) }
@@ -79,8 +109,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction().replace(R.id.fragment_container, fragment)
-            .commit()
+        runOnUiThread {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .commit()
+        }
     }
 
     suspend fun fetchGrades(login: String, password: String) {
@@ -88,7 +121,7 @@ class MainActivity : AppCompatActivity() {
             "login" to login, "pass" to password
         )
 
-        val url = "http://192.168.1.21:3000/api/new/grades"
+        val url = "$domain/api/new/grades"
         val options = FetchOptions(
             method = "POST", body = toJson(body)
         )
@@ -114,6 +147,14 @@ class MainActivity : AppCompatActivity() {
         }
 
         gradesData = semesters
+
+        withContext(Dispatchers.Main) {
+            areGradesFetched = true
+
+            if (currentTab == "grades") {
+                openFragment(GradesFragment())
+            }
+        }
     }
 
     suspend fun fetchSchedule(login: String, password: String) {
@@ -121,7 +162,7 @@ class MainActivity : AppCompatActivity() {
             "login" to login, "pass" to password
         )
 
-        val url = "http://192.168.1.21:3000/api/new/schedule"
+        val url = "$domain/api/new/schedule"
         val options = FetchOptions(
             method = "POST", body = toJson(body)
         )
@@ -138,6 +179,14 @@ class MainActivity : AppCompatActivity() {
         handleDaySchedule(schedule.friday, DayOfWeek.FRIDAY)
         handleDaySchedule(schedule.saturday, DayOfWeek.SATURDAY)
         handleDaySchedule(schedule.sunday, DayOfWeek.SUNDAY)
+
+        withContext(Dispatchers.Main) {
+            isScheduleFetched = true
+
+            if (currentTab == "schedule") {
+                openFragment(ScheduleFragment())
+            }
+        }
     }
 
     fun handleDaySchedule(lessons: List<JsonScheduleDay?>, day: DayOfWeek) {
