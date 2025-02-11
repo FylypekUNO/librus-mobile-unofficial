@@ -46,6 +46,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.gson)
     implementation(libs.threetenabp)
+    implementation(libs.androidx.security.crypto)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

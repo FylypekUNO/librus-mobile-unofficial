@@ -3,6 +3,8 @@ package pl.fylypek.librus_mobile_unofficial
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.coroutines.GlobalScope
@@ -48,14 +50,29 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        val masterKey = MasterKey.Builder(this)
+            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+            .build()
+
+        val sharedPreferences = EncryptedSharedPreferences.create(
+            this,
+            "librus-credentials",
+            masterKey,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
+
+        var login = sharedPreferences.getString("login", "") ?: ""
+        var password = sharedPreferences.getString("password", "") ?: ""
+
         // Ustawienie domyślnego fragmentu
         if (savedInstanceState == null) {
             bottomNavigationView.selectedItemId = R.id.nav_grades
         }
 
         // Pobranie danych ocen i planu lekcji
-        GlobalScope.launch { fetchGrades() }
-        GlobalScope.launch { fetchSchedule() }
+        GlobalScope.launch { fetchGrades(login, password) }
+        GlobalScope.launch { fetchSchedule(login, password) }
     }
 
     private fun openFragment(fragment: Fragment) {
@@ -63,7 +80,7 @@ class MainActivity : AppCompatActivity() {
             .commit()
     }
 
-    suspend fun fetchGrades() {
+    suspend fun fetchGrades(login: String, password: String) {
         val body = mapOf(
             "login" to login, "pass" to password
         )
@@ -96,7 +113,7 @@ class MainActivity : AppCompatActivity() {
         gradesData = semesters
     }
 
-    suspend fun fetchSchedule() {
+    suspend fun fetchSchedule(login: String, password: String) {
         val body = mapOf(
             "login" to login, "pass" to password
         )
