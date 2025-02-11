@@ -65,6 +65,9 @@ class MainActivity : AppCompatActivity() {
         var login = sharedPreferences.getString("login", "") ?: ""
         var password = sharedPreferences.getString("password", "") ?: ""
 
+        // sharedPreferences.edit().putString("key1", "value1").apply()
+        // sharedPreferences.edit().putString("key2", "value2").apply()
+
         // Ustawienie domyślnego fragmentu
         if (savedInstanceState == null) {
             bottomNavigationView.selectedItemId = R.id.nav_grades
