@@ -15,7 +15,7 @@ var gradesData: List<Semester> = listOf(
     )
 )
 
-var weeklyScheduleData: Map<DayOfWeek, List<ScheduleItem>> = mapOf(
+var weeklyScheduleData: Map<DayOfWeek, List<ScheduleItem>> = mutableMapOf(
     DayOfWeek.MONDAY to emptyList(),
     DayOfWeek.TUESDAY to emptyList(),
     DayOfWeek.WEDNESDAY to emptyList(),
